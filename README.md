@@ -1,0 +1,2 @@
+# screenshoter
+Captures screenshots
