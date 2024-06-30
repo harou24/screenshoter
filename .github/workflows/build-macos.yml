@@ -1,0 +1,32 @@
+name: Build and Test on macOS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up environment for macOS
+      run: brew install libpng
+
+    - name: Compile on macOS
+      run: |
+        make clean
+        make
+
+    - name: Verify executable exists
+      run: |
+        if [[ ! -f ./screenshot ]]; then
+          echo "Error: Executable not found."
+          exit 1
+        fi
+

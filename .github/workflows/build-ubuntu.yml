@@ -1,0 +1,32 @@
+name: Build and Test on Ubuntu
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up environment for Ubuntu
+      run: sudo apt-get update && sudo apt-get install -y libx11-dev libpng-dev
+
+    - name: Compile on Ubuntu
+      run: |
+        make clean
+        make
+
+    - name: Verify executable exists
+      run: |
+        if [[ ! -f ./screenshot ]]; then
+          echo "Error: Executable not found."
+          exit 1
+        fi
+
