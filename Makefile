@@ -39,9 +39,9 @@ endif
 # Object files
 OBJ = $(OBJ_DIR)/common.o $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC)) $(OBJ_DIR)/main.o
 
-.PHONY: all clean
+.PHONY: all clean $(SCREENSHOTS_DIR)
 
-all: $(OUT)
+all: $(SCREENSHOTS_DIR) $(OUT)
 
 $(OUT): $(OBJ)
 	$(CC) $(OBJ) $(CFLAGS) -o $(OUT)
@@ -57,6 +57,9 @@ $(OBJ_DIR)/common.o: $(COMMON_SRC)
 $(OBJ_DIR)/main.o: $(MAIN_SRC)
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(SCREENSHOTS_DIR):
+	@mkdir -p $(SCREENSHOTS_DIR)
 
 clean:
 	rm -rf $(OUT) $(OBJ_DIR)
