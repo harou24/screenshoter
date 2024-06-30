@@ -1,13 +1,20 @@
 # Makefile for compiling screenshot program for macOS and Linux
 
+# Define the directories
+SRC_DIR = src
+LIB_DIR = lib
+OBJ_DIR = obj
+BIN_DIR = .
+SCREENSHOTS_DIR = screenshots
+
 # Define the source files
-COMMON_SRC = common.c
-MACOS_SRC = screenshot_macos.c
-LINUX_SRC = screenshot_linux.c
-MAIN_SRC = main.c
+COMMON_SRC = $(LIB_DIR)/common.c
+MACOS_SRC = $(SRC_DIR)/screenshot_macos.c
+LINUX_SRC = $(SRC_DIR)/screenshot_linux.c
+MAIN_SRC = $(SRC_DIR)/main.c
 
 # Define the output executable
-OUT = screenshot
+OUT = $(BIN_DIR)/screenshot
 
 # Detect the operating system
 UNAME_S := $(shell uname -s)
@@ -22,20 +29,35 @@ ifeq ($(UNAME_S), Darwin)
     # macOS settings
     CC = clang
     CFLAGS += -framework ApplicationServices -framework CoreGraphics -framework ImageIO
-    SRC = $(COMMON_SRC) $(MACOS_SRC) $(MAIN_SRC)
+    SRC = $(MACOS_SRC)
 else
     # Linux settings
     CFLAGS += -lX11 -lpng
-    SRC = $(COMMON_SRC) $(LINUX_SRC) $(MAIN_SRC)
+    SRC = $(LINUX_SRC)
 endif
+
+# Object files
+OBJ = $(OBJ_DIR)/common.o $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC)) $(OBJ_DIR)/main.o
 
 .PHONY: all clean
 
 all: $(OUT)
 
-$(OUT): $(SRC)
-	$(CC) $(SRC) $(CFLAGS) -o $(OUT)
+$(OUT): $(OBJ)
+	$(CC) $(OBJ) $(CFLAGS) -o $(OUT)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/common.o: $(COMMON_SRC)
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/main.o: $(MAIN_SRC)
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OUT)
+	rm -rf $(OUT) $(OBJ_DIR)
 

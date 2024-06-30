@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "common.h"
+#include "../lib/common.h"
 
 void take_screenshot() {
     Display* display = XOpenDisplay(NULL);
@@ -45,10 +45,12 @@ void take_screenshot() {
 
     time_t rawtime;
     struct tm *timeinfo;
-    char buffer[80];
+    char time_buffer[40];
+    char buffer[120];
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(buffer, sizeof(buffer), "screenshot_%Y%m%d%H%M%S.png", timeinfo);
+    strftime(time_buffer, sizeof(time_buffer), "%Y%m%d%H%M%S", timeinfo);
+    snprintf(buffer, sizeof(buffer), "screenshots/screenshot_%s.png", time_buffer);
 
     save_png(buffer, image_data, width, height);
 
