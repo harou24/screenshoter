@@ -1,5 +1,3 @@
-#include "../lib/common.h"
-
 #ifdef __APPLE__
 void take_screenshot();
 #else

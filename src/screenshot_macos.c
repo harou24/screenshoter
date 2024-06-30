@@ -1,10 +1,10 @@
 #ifdef __APPLE__
 #include <ApplicationServices/ApplicationServices.h>
 #include <CoreGraphics/CoreGraphics.h>
+#include <ImageIO/ImageIO.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "../lib/common.h"
 
 void take_screenshot() {
     CGDirectDisplayID displayID = CGMainDisplayID();
@@ -35,10 +35,26 @@ void take_screenshot() {
     strftime(time_buffer, sizeof(time_buffer), "%Y%m%d%H%M%S", timeinfo);
     snprintf(buffer, sizeof(buffer), "screenshots/screenshot_%s.png", time_buffer);
 
-    save_png(buffer, image_data, width, height);
+    CFStringRef path = CFStringCreateWithCString(NULL, buffer, kCFStringEncodingUTF8);
+    CFURLRef url = CFURLCreateWithFileSystemPath(NULL, path, kCFURLPOSIXPathStyle, false);
+    CFRelease(path);
 
-    CGContextRelease(context);
+    CFStringRef type = CFStringCreateWithCString(NULL, "public.png", kCFStringEncodingUTF8);
+    CGImageDestinationRef destination = CGImageDestinationCreateWithURL(url, type, 1, NULL);
+    CFRelease(url);
+    CFRelease(type);
+    if (!destination) {
+        fprintf(stderr, "Failed to create image destination\n");
+        CGImageRelease(screenshot);
+        return;
+    }
+    CGImageDestinationAddImage(destination, screenshot, NULL);
+    if (!CGImageDestinationFinalize(destination)) {
+        fprintf(stderr, "Failed to write image to file\n");
+    }
+    CFRelease(destination);
     CGImageRelease(screenshot);
+    CGContextRelease(context);
     free(image_data);
 }
 #endif
