@@ -32,5 +32,5 @@ The screenshots will be saved in the screenshots directory with filenames in the
 ### Cleaning Up
 To remove the compiled executable and object files, run:
 ```
-Make clean
+make clean
 ```
